@@ -27,6 +27,26 @@ Funciones usadas:
 
 --------------------------------------------------
 
+## <stdlib.h>
+Se utiliza para funciones generales del sistema, incluyendo generación de números aleatorios.
+
+Funciones usadas:
+- rand(): genera números aleatorios.
+
+Uso en el sistema:
+Se utiliza para asignar un puerto dinámico al subscriber:
+
+Ejemplo:
+miDireccion.sin_port = htons(6000 + rand()%1000);
+
+Explicación:
+- rand(): genera un número aleatorio
+- %1000: limita el valor entre 0 y 999
+- 6000 +: ajusta el rango entre 6000 y 6999
+- htons(): convierte el puerto a formato de red
+
+--------------------------------------------------
+
 ## <unistd.h>
 Contiene funciones del sistema operativo.
 
@@ -43,6 +63,25 @@ Elementos usados:
 - struct sockaddr_in: estructura para representar direcciones IP + puerto.
 - htons(): convierte el puerto a formato de red.
 - inet_addr(): convierte una IP en texto a formato numérico.
+- INADDR_ANY: permite usar cualquier dirección IP disponible en la máquina.
+
+--------------------------------------------------
+
+## <sys/socket.h>
+Librería principal para la creación y manejo de sockets.
+
+Funciones usadas:
+- socket()
+- bind()
+- listen()
+- accept()
+- connect()
+- send()
+- sendto()
+- recv()
+- recvfrom()
+
+Es la base de toda la comunicación del sistema.
 
 --------------------------------------------------
 
@@ -65,7 +104,7 @@ Elementos usados:
 - struct sockaddr: estructura genérica de direcciones de socket.
 - struct sockaddr_in: versión específica para IPv4.
 
-Se usa casting (struct sockaddr*) porque las funciones de sockets trabajan con la estructura genérica.
+Se usa casting (struct sockaddr*) porque las funciones de sockets trabajan con la estructura genérica y permiten soportar distintos tipos de direcciones (IPv4, IPv6, etc.).
 
 Campos importantes:
 - sin_family → tipo de dirección (AF_INET)
@@ -86,6 +125,10 @@ Parámetros:
 - SOCK_STREAM: TCP (conexión)
 - SOCK_DGRAM: UDP (sin conexión)
 - 0: protocolo automático
+
+Retorna:
+- Un descriptor de socket
+- -1 en caso de error
 
 --------------------------------------------------
 
@@ -178,16 +221,17 @@ Parámetros:
 
 --------------------------------------------------
 
-## read() / recv()
+## read()
 
-Reciben datos en TCP.
+Proviene de <unistd.h>.
+Se usa para leer datos desde sockets TCP.
 
-Parámetros:
-- socket
-- buffer
-- tamaño máximo
+--------------------------------------------------
 
-Retorna número de bytes leídos.
+## recv()
+
+Proviene de <sys/socket.h>.
+Se usa para recibir datos en sockets.
 
 --------------------------------------------------
 
@@ -249,3 +293,4 @@ Publisher → Broker → Subscriber
 
 - TCP: comunicación confiable
 - UDP: comunicación rápida sin conexión
+
