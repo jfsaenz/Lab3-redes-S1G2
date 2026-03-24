@@ -131,5 +131,5 @@ Las funciones de sockets fueron utilizadas de manera explícita y entendiendo su
 El sistema sigue la arquitectura: Publisher → Broker → Subscriber
 
 y distingue correctamente entre:
-- TCP: comunicación confiable con conexión
-- UDP: comunicación ligera sin conexión
+- TCP: comunicación confiable con conexión establecida previamente
+- UDP: comunicación rápida pero sin conexión establecida previamente
