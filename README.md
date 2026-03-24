@@ -86,7 +86,7 @@ Ejemplo:
 
 direccionBroker.sin_port = htons(5000);
 
-- Se establece AF_INET para indicar que se está trabajando con direcciones IPv4.
+Se establece AF_INET para indicar que se está trabajando con direcciones IPv4.
   
 2. sin_port: almacena el número de puerto en formato de red.
 
@@ -94,7 +94,7 @@ Ejemplo:
 
 direccionBroker.sin_port = htons(5000);
 
-- Se establece el puerto 5000
+Se establece el puerto 5000
 
 3. sin_addr.s_addr: almacena la dirección IP del socket (puede ser una específica o cualquiera)
 
@@ -102,7 +102,7 @@ Ejemplo:
 
 direccionBroker.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-- Permite indicar que la dirección del socket tendrá cierta IP.
+Permite indicar que la dirección del socket tendrá cierta IP.
 
 - htons(): convierte el puerto a formato de red.
 
