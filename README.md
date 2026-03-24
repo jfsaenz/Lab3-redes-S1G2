@@ -158,14 +158,11 @@ Usamos:
 - struct sockaddr: estructura genérica de direcciones de socket.
 - struct sockaddr_in: versión específica para IPv4.
 
-Se usa casting (struct sockaddr*) porque las funciones de sockets trabajan con la estructura genérica y permiten soportar distintos tipos de direcciones (IPv4, IPv6, etc.).
-
-Campos importantes:
-- sin_family->tipo de dirección (AF_INET)
-- sin_addr.s_addr->dirección IP
-- sin_port->puerto (convertido con htons)
+A veces usamos casting (struct sockaddr*) porque las funciones de sockets trabajan con la estructura genérica y permiten soportar distintos tipos de direcciones (IPv4, IPv6, etc.), puede llegar a ser necesario.
 
 --------------------------------------------------
+
+**Sobre <sys/socket.h>**
 
 ## socket()
 
