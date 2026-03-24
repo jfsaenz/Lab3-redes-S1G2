@@ -132,7 +132,6 @@ Funciones usadas:
 - connect()
 - send()
 - sendto()
-- recv()
 - recvfrom()
 
 Es la base de toda la comunicación del sistema.
@@ -162,7 +161,7 @@ A veces usamos casting (struct sockaddr*) porque las funciones de sockets trabaj
 
 --------------------------------------------------
 
-**Sobre <sys/socket.h>**
+**Funciones importantes**
 
 ## socket()
 
@@ -279,13 +278,6 @@ Se usa para leer datos desde sockets TCP.
 
 --------------------------------------------------
 
-## recv()
-
-Proviene de <sys/socket.h>.
-Se usa para recibir datos en sockets.
-
---------------------------------------------------
-
 ## recvfrom()
 
 Recibe datos en UDP.
@@ -389,7 +381,7 @@ Publisher->Broker->Subscriber
 
 --------------------------------------------------
 
-## recv()
+## read()
 - broker_tcp.c->recibir eventos de publishers.
 - subscriber_tcp.c->recibir eventos del broker.
 
@@ -398,7 +390,8 @@ Publisher->Broker->Subscriber
 ## sendto()
 - publisher_udp.c->enviar eventos sin conexión al broker.
 - broker_udp.c->reenviar eventos a subscribers UDP.
-
+- subscriber_udp.c->registrarse como SUBSCRIBER
+  
 --------------------------------------------------
 
 ## recvfrom()
