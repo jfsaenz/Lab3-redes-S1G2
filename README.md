@@ -90,12 +90,12 @@ Se usa únicamente en el broker TCP.
 
 Permite manejar múltiples sockets simultáneamente.
 
-Elementos usados:
-- fd_set
-- FD_ZERO()
-- FD_SET()
-- FD_ISSET()
-- select()
+Usamos:
+- fd_set: Es una estructura que guarda el conjunto de sockets que se quieren monitorear (lo usamos en el broker TCP para vigilar el socket de escucha y los sockets de los clientes conectados).
+- FD_ZERO(): Se usa en el ciclo infinito del broker TCP para limpiar el conjunto de sockets vigilados antes de volver a agregar el socket de escucha y los sockets de los clientes activos.
+- FD_SET(): Se usa en el broker TCP para agregar al conjunto vigilado primero el socket de escucha y luego los sockets de cada publisher o subscriber conectado.
+- FD_ISSET(): Se usa después del select() en el broker TCP para verificar si hubo actividad en el socket de escucha (nueva conexión) o en alguno de los sockets de los clientes (mensaje o desconexión).
+- select(): Se usa en el broker TCP para monitorear varios sockets simultáneamente y quedarse bloqueado hasta que alguno tenga actividad (que puede ser o nueva conexión o llegada de mensaje).
 
 --------------------------------------------------
 
