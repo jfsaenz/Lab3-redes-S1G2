@@ -126,10 +126,9 @@ Uso en el sistema:
 
 ## Conclusión
 
-Las funciones de sockets fueron utilizadas de manera explícita y controlada, permitiendo implementar la comunicación sin librerías de alto nivel.
+Las funciones de sockets fueron utilizadas de manera explícita y entendiendo su rol, lo cual nos ayudó a implementar la comunicación.
 
-El sistema sigue el flujo:
-Publisher → Broker → Subscriber
+El sistema sigue la arquitectura: Publisher → Broker → Subscriber
 
 y distingue correctamente entre:
 - TCP: comunicación confiable con conexión
