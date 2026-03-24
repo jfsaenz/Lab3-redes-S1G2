@@ -107,9 +107,9 @@ Elementos usados:
 Se usa casting (struct sockaddr*) porque las funciones de sockets trabajan con la estructura genérica y permiten soportar distintos tipos de direcciones (IPv4, IPv6, etc.).
 
 Campos importantes:
-- sin_family → tipo de dirección (AF_INET)
-- sin_addr.s_addr → dirección IP
-- sin_port → puerto (convertido con htons)
+- sin_family->tipo de dirección (AF_INET)
+- sin_addr.s_addr->dirección IP
+- sin_port->puerto (convertido con htons)
 
 --------------------------------------------------
 
@@ -289,7 +289,7 @@ Se documentó completamente:
 
 El sistema implementa correctamente:
 
-Publisher → Broker → Subscriber
+Publisher->Broker->Subscriber
 
 - TCP: comunicación confiable
 - UDP: comunicación rápida sin conexión
@@ -300,72 +300,72 @@ Publisher → Broker → Subscriber
 # Uso de funciones en el sistema
 
 ## socket()
-- broker_tcp.c → crear el socket servidor TCP que escucha conexiones de publishers y subscribers.
-- broker_udp.c → crear el socket servidor UDP para recibir mensajes sin conexión.
-- publisher_tcp.c → crear socket cliente TCP para conectarse al broker.
-- publisher_udp.c → crear socket cliente UDP para enviar eventos al broker.
-- subscriber_tcp.c → crear socket cliente TCP para conectarse al broker.
-- subscriber_udp.c → crear socket UDP para registrarse y recibir eventos.
+- broker_tcp.c->crear el socket servidor TCP que escucha conexiones de publishers y subscribers.
+- broker_udp.c->crear el socket servidor UDP para recibir mensajes sin conexión.
+- publisher_tcp.c->crear socket cliente TCP para conectarse al broker.
+- publisher_udp.c->crear socket cliente UDP para enviar eventos al broker.
+- subscriber_tcp.c->crear socket cliente TCP para conectarse al broker.
+- subscriber_udp.c->crear socket UDP para registrarse y recibir eventos.
 
 --------------------------------------------------
 
 ## bind()
-- broker_tcp.c → asociar el socket TCP del broker al puerto 5000.
-- broker_udp.c → asociar el socket UDP del broker al puerto 5000.
-- subscriber_udp.c → asociar el socket UDP a un puerto dinámico generado con rand().
+- broker_tcp.c->asociar el socket TCP del broker al puerto 5000.
+- broker_udp.c->asociar el socket UDP del broker al puerto 5000.
+- subscriber_udp.c->asociar el socket UDP a un puerto dinámico generado con rand().
 
 --------------------------------------------------
 
 ## listen()
-- broker_tcp.c → poner el socket TCP en estado de escucha.
+- broker_tcp.c->poner el socket TCP en estado de escucha.
 
 --------------------------------------------------
 
 ## accept()
-- broker_tcp.c → aceptar conexiones TCP de clientes y crear sockets individuales.
+- broker_tcp.c->aceptar conexiones TCP de clientes y crear sockets individuales.
 
 --------------------------------------------------
 
 ## connect()
-- publisher_tcp.c → establecer conexión TCP con el broker.
-- subscriber_tcp.c → conectarse al broker para registrarse.
+- publisher_tcp.c->establecer conexión TCP con el broker.
+- subscriber_tcp.c->conectarse al broker para registrarse.
 
 --------------------------------------------------
 
 ## send()
-- publisher_tcp.c → enviar eventos al broker.
-- broker_tcp.c → reenviar eventos a los subscribers.
+- publisher_tcp.c->enviar eventos al broker.
+- broker_tcp.c->reenviar eventos a los subscribers.
 
 --------------------------------------------------
 
 ## recv()
-- broker_tcp.c → recibir eventos de publishers.
-- subscriber_tcp.c → recibir eventos del broker.
+- broker_tcp.c->recibir eventos de publishers.
+- subscriber_tcp.c->recibir eventos del broker.
 
 --------------------------------------------------
 
 ## sendto()
-- publisher_udp.c → enviar eventos sin conexión al broker.
-- broker_udp.c → reenviar eventos a subscribers UDP.
+- publisher_udp.c->enviar eventos sin conexión al broker.
+- broker_udp.c->reenviar eventos a subscribers UDP.
 
 --------------------------------------------------
 
 ## recvfrom()
-- broker_udp.c → recibir mensajes de publishers UDP.
-- subscriber_udp.c → recibir eventos del broker.
+- broker_udp.c->recibir mensajes de publishers UDP.
+- subscriber_udp.c->recibir eventos del broker.
 
 --------------------------------------------------
 
 ## select()
-- broker_tcp.c → monitorear múltiples sockets simultáneamente.
+- broker_tcp.c->monitorear múltiples sockets simultáneamente.
 
 --------------------------------------------------
 
 ## close()
-- todos los archivos → cerrar sockets al finalizar o desconectarse.
+- todos los archivos->cerrar sockets al finalizar o desconectarse.
 
 --------------------------------------------------
 
 ## rand()
-- subscriber_udp.c → generar un puerto dinámico entre 6000 y 6999.
+- subscriber_udp.c->generar un puerto dinámico entre 6000 y 6999.
 
