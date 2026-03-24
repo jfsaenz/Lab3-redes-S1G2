@@ -1,42 +1,41 @@
 # Interacción con funciones de sockets
 
-En la implementación del sistema Publisher–Broker–Subscriber se emplearon funciones de bajo nivel del lenguaje C para la comunicación mediante sockets.
-A continuación, se describe la interacción del programa con cada función utilizada, indicando el archivo correspondiente y explicando detalladamente los parámetros utilizados.
+En la implementación del sistema Publisher–Broker–Subscriber se emplearon funciones de lenguaje C para la comunicación mediante sockets. A continuación, se describe la interacción del programa con cada función utilizada, indicando el archivo correspondiente y explicando los parámetros que usamos.
 
-Además, se documentan explícitamente las librerías utilizadas, cumpliendo con el requisito de especificar punto a punto la interacción con cada una.
+Además, se documentan explícitamente las librerías utilizadas.
 
 --------------------------------------------------
 
 # Librerías utilizadas
 
-## <stdio.h>
+## 1. <stdio.h>
 Se utiliza para entrada y salida por consola.
 
 Funciones usadas:
 - printf(): mostrar mensajes en consola.
-- fgets(): leer mensajes desde teclado.
+- fgets(): leer mensajes desde teclado. En este caso, los eventos de fútbol que ingresa el usuario.
 
 --------------------------------------------------
 
-## <string.h>
+## 2. <string.h>
 Se utiliza para manipulación de cadenas.
 
 Funciones usadas:
 - strlen(): obtener el tamaño de un mensaje antes de enviarlo.
-- strncmp(): comparar mensajes (ej: identificar "SUBSCRIBER" o "PUBLISHER").
+- strncmp(): comparar cadenas (ej: identificar "SUBSCRIBER" o "PUBLISHER"). Esto nos ayuda a saber el tipo de cliente y por ende ayudarnos a conocer el tipo de interacción del broker con ese cliente.
 
 --------------------------------------------------
 
-## <stdlib.h>
+## 3. <stdlib.h>
 Se utiliza para funciones generales del sistema, incluyendo generación de números aleatorios.
 
 Funciones usadas:
 - rand(): genera números aleatorios.
 
 Uso en el sistema:
-Se utiliza para asignar un puerto dinámico al subscriber:
+Se utiliza para asignar un puerto dinámico de forma manual al subscriber. En nuestro caso lo hacemos dentro de un rango definido, que va de 6000 a 6999.
 
-Ejemplo:
+En la línea:
 miDireccion.sin_port = htons(6000 + rand()%1000);
 
 Explicación:
@@ -47,27 +46,82 @@ Explicación:
 
 --------------------------------------------------
 
-## <unistd.h>
+## 4. <unistd.h>
 Contiene funciones del sistema operativo.
 
 Funciones usadas:
-- read(): leer datos desde un socket TCP.
-- close(): cerrar sockets y liberar recursos.
+- read(): permite leer datos recibidos desde un socket TCP y almacenarlos en un buffer.
+  
+Ejemplo:
+int cantidadBytesLeidos = read(socketsClientes[i], bufferRecepcion, maxBytesFragmento);
+
+- Aquí el broker TCP usa read() para recibir mensajes enviados por los clientes. La función devuelve la cantidad de bytes leídos. Por ello, luego podemos revisar si el valor es 0 o negativo, significa que el cliente se desconectó. 
+
+- close(): cerrar sockets y liberar los recursos.
+
+Ejemplo:
+close(socketsClientes[i]);
+
+- Cuando el broker detecta que un cliente se desconectó, cierra su socket para dejar de monitorearlo y evitar consumir recursos innecesarios.
 
 --------------------------------------------------
 
-## <arpa/inet.h>
+## 5. <arpa/inet.h>
 Librería fundamental para redes IPv4.
 
 Elementos usados:
 - struct sockaddr_in: estructura para representar direcciones IP + puerto.
+
+Ejemplo:
+
+struct sockaddr_in direccionBroker;
+
+Se usa para configurar la dirección del broker o de los clientes, indicando después la familia de direcciones IP (IPv4 para nosotros), IP y puerto.
+
+Para eso usamos estos campos:
+
+1. sin_family: indica la familia de direcciones utilizada.
+   
+Ejemplo:
+
+direccionBroker.sin_port = htons(5000);
+
+- Se establece AF_INET para indicar que se está trabajando con direcciones IPv4.
+  
+2. sin_port: almacena el número de puerto en formato de red.
+
+Ejemplo:
+
+direccionBroker.sin_port = htons(5000);
+
+- Se establece el puerto 5000
+
+3. sin_addr.s_addr: almacena la dirección IP del socket (puede ser una específica o cualquiera)
+
+Ejemplo:
+
+direccionBroker.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+- Permite indicar que la dirección del socket tendrá cierta IP.
+
 - htons(): convierte el puerto a formato de red.
+
 - inet_addr(): convierte una IP en texto a formato numérico.
-- INADDR_ANY: permite usar cualquier dirección IP disponible en la máquina.
+
+Ejemplo:
+direccionBroker.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+- INADDR_ANY: permite que el broker escuche en cualquier dirección IP disponible en la máquina.
+
+Ejemplo:
+
+direccionBroker.sin_addr.s_addr = INADDR_ANY;
+
+- Así el socket del broker TCP acepta conexiones por cualquier dirección IP que tenga esta máquina 
 
 --------------------------------------------------
 
-## <sys/socket.h>
+## 6. <sys/socket.h>
 Librería principal para la creación y manejo de sockets.
 
 Funciones usadas:
@@ -85,7 +139,7 @@ Es la base de toda la comunicación del sistema.
 
 --------------------------------------------------
 
-## <sys/select.h>
+## 7. <sys/select.h>
 Se usa únicamente en el broker TCP.
 
 Permite manejar múltiples sockets simultáneamente.
