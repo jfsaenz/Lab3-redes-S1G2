@@ -84,7 +84,7 @@ Para eso usamos estos campos:
    
 Ejemplo:
 
-direccionBroker.sin_port = htons(5000);
+direccionBroker.sin_family = AF_INET;
 
 Se establece AF_INET para indicar que se está trabajando con direcciones IPv4.
   
