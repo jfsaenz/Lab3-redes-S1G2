@@ -1,135 +1,251 @@
 # Interacción con funciones de sockets
 
 En la implementación del sistema Publisher–Broker–Subscriber se emplearon funciones de bajo nivel del lenguaje C para la comunicación mediante sockets.
-A continuación, se describe la interacción del programa con cada función utilizada, indicando el archivo correspondiente.
+A continuación, se describe la interacción del programa con cada función utilizada, indicando el archivo correspondiente y explicando detalladamente los parámetros utilizados.
+
+Además, se documentan explícitamente las librerías utilizadas, cumpliendo con el requisito de especificar punto a punto la interacción con cada una.
+
+--------------------------------------------------
+
+# Librerías utilizadas
+
+## <stdio.h>
+Se utiliza para entrada y salida por consola.
+
+Funciones usadas:
+- printf(): mostrar mensajes en consola.
+- fgets(): leer mensajes desde teclado.
+
+--------------------------------------------------
+
+## <string.h>
+Se utiliza para manipulación de cadenas.
+
+Funciones usadas:
+- strlen(): obtener el tamaño de un mensaje antes de enviarlo.
+- strncmp(): comparar mensajes (ej: identificar "SUBSCRIBER" o "PUBLISHER").
+
+--------------------------------------------------
+
+## <unistd.h>
+Contiene funciones del sistema operativo.
+
+Funciones usadas:
+- read(): leer datos desde un socket TCP.
+- close(): cerrar sockets y liberar recursos.
+
+--------------------------------------------------
+
+## <arpa/inet.h>
+Librería fundamental para redes IPv4.
+
+Elementos usados:
+- struct sockaddr_in: estructura para representar direcciones IP + puerto.
+- htons(): convierte el puerto a formato de red.
+- inet_addr(): convierte una IP en texto a formato numérico.
+
+--------------------------------------------------
+
+## <sys/select.h>
+Se usa únicamente en el broker TCP.
+
+Permite manejar múltiples sockets simultáneamente.
+
+Elementos usados:
+- fd_set
+- FD_ZERO()
+- FD_SET()
+- FD_ISSET()
+- select()
+
+--------------------------------------------------
+
+## ¿Qué es sockaddr y sockaddr_in?
+
+- struct sockaddr: estructura genérica de direcciones de socket.
+- struct sockaddr_in: versión específica para IPv4.
+
+Se usa casting (struct sockaddr*) porque las funciones de sockets trabajan con la estructura genérica.
+
+Campos importantes:
+- sin_family → tipo de dirección (AF_INET)
+- sin_addr.s_addr → dirección IP
+- sin_port → puerto (convertido con htons)
+
+--------------------------------------------------
 
 ## socket()
 
-Se utiliza para crear los endpoints de comunicación.
+Crea un socket de comunicación.
 
-### UDP — subscriber_udp.c
-socketSubscriber = socket(AF_INET, SOCK_DGRAM, 0);
+Ejemplo:
+socket(AF_INET, SOCK_STREAM, 0);
 
-### TCP — publisher_tcp.c
-socketPublisher = socket(AF_INET, SOCK_STREAM, 0);
+Parámetros:
+- AF_INET: IPv4
+- SOCK_STREAM: TCP (conexión)
+- SOCK_DGRAM: UDP (sin conexión)
+- 0: protocolo automático
 
-Uso en el sistema:
-- SOCK_STREAM corresponde a comunicación TCP (orientada a conexión)
-- SOCK_DGRAM corresponde a comunicación UDP (no orientada a conexión)
+--------------------------------------------------
 
 ## bind()
 
-Se utiliza para asociar un socket a una dirección IP y un puerto.
+Asocia un socket a una dirección IP y puerto.
 
-### broker_udp.c
-bind(socketUDPBroker, (struct sockaddr*)&direccionSocketUDPBroker, sizeof(direccionSocketUDPBroker));
+Ejemplo:
+bind(socket, (struct sockaddr*)&direccion, sizeof(direccion));
 
-### subscriber_udp.c
-bind(socketSubscriber, (struct sockaddr*)&miDireccion, sizeof(miDireccion));
+Parámetros:
+- socket: descriptor
+- dirección: estructura sockaddr
+- tamaño: tamaño de la estructura
 
-Uso en el sistema:
-- El broker se asocia al puerto 5000
-- El subscriber UDP utiliza un puerto dinámico para recibir mensajes
+--------------------------------------------------
 
 ## listen()
 
-Se utiliza en el broker TCP para escuchar conexiones entrantes.
+Activa modo escucha (TCP).
 
-### broker_tcp.c
+Ejemplo:
 listen(socketEscucha, 5);
 
-Uso en el sistema:
-- Permite que el broker acepte múltiples conexiones en espera
+Parámetros:
+- socketEscucha: socket previamente enlazado
+- 5: número máximo de conexiones en espera (backlog)
+
+--------------------------------------------------
 
 ## accept()
 
-Se utiliza para aceptar conexiones entrantes en el broker TCP.
+Acepta conexiones entrantes.
 
-### broker_tcp.c
-int nuevoSocketCliente = accept(socketEscucha, (struct sockaddr*)&direccionSocketEscucha, (socklen_t*)&tamanioDireccionSocketEscucha);
+Ejemplo:
+accept(socketEscucha, (struct sockaddr*)&dir, &tam);
 
-Uso en el sistema:
-- Cada cliente obtiene su propio socket de comunicación
-- Permite manejar múltiples conexiones simultáneamente
+Parámetros:
+- socketEscucha
+- dirección del cliente
+- tamaño de la dirección
+
+Retorna un nuevo socket para el cliente.
+
+--------------------------------------------------
 
 ## connect()
 
-Se utiliza en clientes TCP para conectarse al broker.
+Conecta cliente a servidor.
 
-### subscriber_tcp.c
-connect(socketSubscriber, (struct sockaddr *)&direccionSocketBroker, sizeof(direccionSocketBroker));
+Ejemplo:
+connect(socket, (struct sockaddr*)&dir, sizeof(dir));
 
-### publisher_tcp.c
-connect(socketPublisher, (struct sockaddr *)&direccionBroker, sizeof(direccionBroker));
+Parámetros:
+- socket
+- dirección servidor
+- tamaño
 
-Uso en el sistema:
-- Establece conexión con el broker en 127.0.0.1:5000
+--------------------------------------------------
 
-## send() y sendto()
+## send()
 
-Se utilizan para enviar datos.
+Envía datos en TCP.
 
-### publisher_tcp.c
-send(socketPublisher, bufferMensaje, strlen(bufferMensaje), 0);
+Ejemplo:
+send(socket, buffer, strlen(buffer), 0);
 
-### publisher_udp.c
-sendto(socketPublisher, bufferMensaje, strlen(bufferMensaje), 0, (struct sockaddr *)&direccionBroker, sizeof(direccionBroker));
+Parámetros:
+- socket
+- buffer
+- tamaño
+- flags (0)
 
-### broker_udp.c
-sendto(socketUDPBroker, bufferMensaje, strlen(bufferMensaje), 0, (struct sockaddr*)&listaSubscribers[i], sizeof(listaSubscribers[i]));
+--------------------------------------------------
 
-Uso en el sistema:
-- El publisher envía eventos al broker
-- El broker reenvía eventos a los subscribers
+## sendto()
 
-## recv(), read() y recvfrom()
+Envía datos en UDP.
 
-Se utilizan para recibir datos.
+Ejemplo:
+sendto(socket, buffer, len, 0, (struct sockaddr*)&dir, sizeof(dir));
 
-### subscriber_tcp.c
-int cantidadBytesLeidos = read(socketSubscriber, bufferMensaje, maxBytesFragmento);
+Parámetros:
+- socket
+- buffer
+- tamaño
+- flags
+- dirección destino
+- tamaño dirección
 
-### subscriber_udp.c
-int cantidadBytesLeidos = recvfrom(socketSubscriber, bufferMensaje, maxBytesFragmento, 0, NULL, NULL);
+--------------------------------------------------
 
-### broker_udp.c
-int bytesRecibidos = recvfrom(socketUDPBroker, bufferMensaje, maxBytesFragmento, 0, (struct sockaddr*)&direccionSocketCliente, &tamanioDireccionSocketCliente);
+## read() / recv()
 
-Uso en el sistema:
-- El broker recibe eventos de los publishers
-- Los subscribers reciben eventos del broker
+Reciben datos en TCP.
+
+Parámetros:
+- socket
+- buffer
+- tamaño máximo
+
+Retorna número de bytes leídos.
+
+--------------------------------------------------
+
+## recvfrom()
+
+Recibe datos en UDP.
+
+Ejemplo:
+recvfrom(socket, buffer, max, 0, (struct sockaddr*)&dir, &tam);
+
+Parámetros:
+- socket
+- buffer
+- tamaño
+- flags
+- dirección origen
+- tamaño dirección
+
+--------------------------------------------------
 
 ## select()
 
-Se utiliza en el broker TCP para manejar múltiples clientes.
+Permite manejar múltiples conexiones sin usar hilos.
 
-### broker_tcp.c
-select(mayorSocketVigilado + 1, &socketsVigilados, NULL, NULL, NULL);
+Ejemplo:
+select(max+1, &set, NULL, NULL, NULL);
 
-Uso en el sistema:
-- Detecta nuevas conexiones
-- Detecta actividad en clientes
-- Permite concurrencia sin hilos
+Parámetros:
+- max+1: mayor descriptor + 1
+- set: sockets vigilados
+- NULL: escritura
+- NULL: excepciones
+- NULL: espera indefinida
+
+--------------------------------------------------
 
 ## close()
 
-Se utiliza para cerrar sockets.
+Cierra un socket.
 
-### subscriber_tcp.c
-close(socketSubscriber);
+Ejemplo:
+close(socket);
 
-### broker_tcp.c
-close(socketsClientes[i]);
+Libera recursos del sistema.
 
-Uso en el sistema:
-- Libera recursos cuando un cliente se desconecta
+--------------------------------------------------
 
 ## Conclusión
 
-Las funciones de sockets fueron utilizadas de manera explícita y entendiendo su rol, lo cual nos ayudó a implementar la comunicación.
+Se documentó completamente:
+- Librerías utilizadas
+- Funciones de sockets
+- Parámetros
+- Estructuras de red
 
-El sistema sigue la arquitectura: Publisher -> Broker -> Subscriber
+El sistema implementa correctamente:
 
-y distingue correctamente entre:
-- TCP: comunicación confiable con conexión establecida previamente
-- UDP: comunicación rápida pero sin conexión establecida previamente
+Publisher → Broker → Subscriber
+
+- TCP: comunicación confiable
+- UDP: comunicación rápida sin conexión
