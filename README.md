@@ -132,6 +132,7 @@ Funciones usadas:
 - connect()
 - send()
 - sendto()
+- recv()
 - recvfrom()
 
 Es la base de toda la comunicación del sistema.
@@ -278,7 +279,8 @@ Se usa para leer datos desde sockets TCP.
 
 --------------------------------------------------
 
-## recvfrom()
+## recv()
+- recvfrom()
 
 Recibe datos en UDP.
 
@@ -394,7 +396,8 @@ Publisher->Broker->Subscriber
   
 --------------------------------------------------
 
-## recvfrom()
+## recv()
+- recvfrom()
 - broker_udp.c->recibir mensajes de publishers UDP.
 - subscriber_udp.c->recibir eventos del broker.
 
@@ -412,4 +415,17 @@ Publisher->Broker->Subscriber
 
 ## rand()
 - subscriber_udp.c->generar un puerto dinámico entre 6000 y 6999.
+
+
+--------------------------------------------------
+
+# Aclaraciones técnicas adicionales
+
+## read() vs recv()
+- read(): función genérica del sistema (<unistd.h>) que también puede usarse con sockets.
+- recv(): función específica de sockets (<sys/socket.h>) para recibir datos.
+
+## Puerto dinámico
+El puerto asignado en el subscriber UDP es pseudoaleatorio dentro del rango 6000–6999, no dinámico asignado por el sistema operativo.
+
 
