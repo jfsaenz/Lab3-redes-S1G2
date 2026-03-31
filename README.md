@@ -206,7 +206,7 @@ listen(socketEscucha, 5);
 
 Parámetros:
 - socketEscucha: socket previamente enlazado
-- 5: número máximo de conexiones en espera (backlog)
+- 5: número máximo de conexiones en espera
 
 --------------------------------------------------
 
@@ -426,6 +426,6 @@ Publisher->Broker->Subscriber
 - recv(): función específica de sockets (<sys/socket.h>) para recibir datos.
 
 ## Puerto dinámico
-El puerto asignado en el subscriber UDP es pseudoaleatorio dentro del rango 6000–6999, no dinámico asignado por el sistema operativo.
+El puerto asignado en el subscriber UDP dentro del rango 6000–6999, no dinámico asignado por el sistema operativo.
 
 
